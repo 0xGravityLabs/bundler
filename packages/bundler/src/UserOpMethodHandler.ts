@@ -99,9 +99,9 @@ export class UserOpMethodHandler {
    */
   async estimateUserOperationGas (userOp1: UserOperationStruct, entryPointInput: string): Promise<EstimateUserOpGasResult> {
     const userOp = {
+      paymasterAndData: '0x',
       ...await resolveProperties(userOp1),
       // default values for missing fields.
-      paymasterAndData: '0x',
       maxFeePerGas: 0,
       maxPriorityFeePerGas: 0,
       preVerificationGas: 0,
