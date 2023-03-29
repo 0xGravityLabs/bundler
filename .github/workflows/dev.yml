@@ -17,7 +17,9 @@ jobs:
 
       - run: |
           yarn
-          sh dockers/bundler/dbuild.sh
+          cd dockers/bundler
+          sh dbuild.sh
+          cd ../..
           docker build -f dockers/bundler/Dockerfile . -t ${{ SECRETS.REGISTRY_USERNAME }}.azurecr.io/dev-${{ SECRETS.REGISTRY_NAME }}:${{ github.sha }}
           docker push ${{ SECRETS.REGISTRY_USERNAME }}.azurecr.io/dev-${{ SECRETS.REGISTRY_NAME }}:${{ github.sha }}
           docker tag ${{ SECRETS.REGISTRY_USERNAME }}.azurecr.io/dev-${{ SECRETS.REGISTRY_NAME }}:${{ github.sha }} ${{ SECRETS.REGISTRY_USERNAME }}.azurecr.io/dev-${{ SECRETS.REGISTRY_NAME }}:latest

@@ -15,6 +15,7 @@ find ./dbuild.sh ../../packages/*/src/ -type f -newer dist/bundler.js 2>&1 | hea
 	echo webpacking..
 	npx webpack
 }
+ls
 
 # docker build -t $IMAGE .
 # docker tag $IMAGE $IMAGE:$VERSION
