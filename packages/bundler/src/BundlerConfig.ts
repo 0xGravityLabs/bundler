@@ -7,6 +7,7 @@ export interface BundlerConfig {
   gasFactor: string
   minBalance: string
   mnemonic: string
+  privateKey: string
   network: string
   port: string
   unsafe: boolean
@@ -28,6 +29,7 @@ export const BundlerConfigShape = {
   gasFactor: ow.string,
   minBalance: ow.string,
   mnemonic: ow.string,
+  privateKey: ow.string,
   network: ow.string,
   port: ow.string,
   unsafe: ow.boolean,

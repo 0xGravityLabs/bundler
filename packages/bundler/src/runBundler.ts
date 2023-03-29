@@ -63,6 +63,7 @@ export async function runBundler (argv: string[], overrideExit = true): Promise<
     .option('--minBalance <number>', 'below this signer balance, keep fee for itself, ignoring "beneficiary" address ')
     .option('--network <string>', 'network name or url')
     .option('--mnemonic <file>', 'mnemonic/private-key file of signer account')
+    .option('--privateKey <file>', 'privateKey')
     .option('--entryPoint <string>', 'address of the supported EntryPoint contract')
     .option('--port <number>', `server listening port (default: ${bundlerConfigDefault.port})`)
     .option('--config <string>', 'path to config file', CONFIG_FILE_NAME)
