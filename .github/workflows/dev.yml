@@ -1,0 +1,22 @@
+name: Dev-CI-CD
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@master
+
+      - name: 'Login via Azure CLI'
+        uses: Azure/docker-login@v1
+        with:
+          login-server: ${{ SECRETS.REGISTRY_USERNAME }}.azurecr.io
+          username: ${{ SECRETS.REGISTRY_USERNAME }}
+          password: ${{ SECRETS.REGISTRY_PASSWORD }}
+
+      - run: |
+          docker build -f dockers/bundler/Dockerfile . -t ${{ SECRETS.REGISTRY_USERNAME }}.azurecr.io/dev-${{ SECRETS.REGISTRY_NAME }}:${{ github.sha }}
+          docker push ${{ SECRETS.REGISTRY_USERNAME }}.azurecr.io/dev-${{ SECRETS.REGISTRY_NAME }}:${{ github.sha }}
+          docker tag ${{ SECRETS.REGISTRY_USERNAME }}.azurecr.io/dev-${{ SECRETS.REGISTRY_NAME }}:${{ github.sha }} ${{ SECRETS.REGISTRY_USERNAME }}.azurecr.io/dev-${{ SECRETS.REGISTRY_NAME }}:latest
+          docker push ${{ SECRETS.REGISTRY_USERNAME }}.azurecr.io/dev-${{ SECRETS.REGISTRY_NAME }}:latest
