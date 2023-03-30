@@ -22,7 +22,7 @@ function mergeConfigs (...sources: Array<Partial<BundlerConfig>>): BundlerConfig
   return mergedConfig
 }
 
-export async function resolveConfiguration (programOpts: any): Promise<{ config: BundlerConfig, provider: BaseProvider, wallet: Wallet }> {
+export async function resolveConfiguration (programOpts: any): Promise<{config: BundlerConfig, provider: BaseProvider, wallet: Wallet}> {
   const commandLineParams = getCommandLineParams(programOpts)
   let fileConfig: Partial<BundlerConfig> = {}
   const configFileName = programOpts.config
@@ -33,8 +33,8 @@ export async function resolveConfiguration (programOpts: any): Promise<{ config:
   console.log('Merged configuration:', JSON.stringify(config))
 
   const provider: BaseProvider = config.network === 'hardhat'
-    // eslint-disable-next-line
-    ? require('hardhat').ethers.provider
+  // eslint-disable-next-line
+      ? require('hardhat').ethers.provider
     : ethers.getDefaultProvider(config.network)
 
   let mnemonic: string
@@ -42,13 +42,14 @@ export async function resolveConfiguration (programOpts: any): Promise<{ config:
   try {
     mnemonic = fs.readFileSync(config.mnemonic, 'ascii').trim()
     wallet = Wallet.fromMnemonic(mnemonic).connect(provider)
-  } catch (e: any) {
+  } catch {
     try {
       // if no mnemonic, fallback to privateKey
+      console.log('Using privateKey')
       const privateKey = fs.readFileSync(config.privateKey, 'ascii').trim()
       wallet = new Wallet(privateKey).connect(provider)
-    } catch {
-      throw new Error(`Unable to read --mnemonic ${config.mnemonic}: ${e.message as string}`)
+    } catch (e: any) {
+      throw new Error(`Unable to read --privateKey ${config.privateKey}: ${e.message as string}`)
     }
   }
   return { config, provider, wallet }
