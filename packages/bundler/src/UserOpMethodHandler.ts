@@ -11,7 +11,7 @@ import { requireCond, RpcError, tostr } from './utils'
 import { ExecutionManager } from './modules/ExecutionManager'
 import { getAddr } from './modules/moduleUtils'
 import { UserOperationByHashResponse, UserOperationReceipt } from './RpcTypes'
-import { ExecutionErrors, UserOperation, ValidationErrors } from './modules/Types'
+import { UserOperation, ValidationErrors } from './modules/Types'
 
 const HEX_REGEX = /^0x[a-fA-F\d]*$/i
 
@@ -109,7 +109,7 @@ export class UserOpMethodHandler {
 
     // todo: checks the existence of parameters, but since we hexlify the inputs, it fails to validate
     await this._validateParameters(deepHexlify(userOp), entryPointInput)
-    const errorResult = await this.entryPoint.callStatic.simulateHandleOp(userOp, "0x0000000000000000000000000000000000000000", "0x").catch(e => e)
+    const errorResult = await this.entryPoint.callStatic.simulateHandleOp(userOp, '0x0000000000000000000000000000000000000000', '0x').catch(e => e)
     if (errorResult.errorName === 'FailedOp') {
       throw new RpcError(errorResult.errorArgs.at(-1), ValidationErrors.SimulateValidation)
     }
