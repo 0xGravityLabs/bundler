@@ -101,41 +101,32 @@ export class UserOpMethodHandler {
     const userOp = {
       ...await resolveProperties(userOp1),
       // default values for missing fields.
-      maxFeePerGas: 0,
-      maxPriorityFeePerGas: 0,
+      maxFeePerGas: 1,
+      maxPriorityFeePerGas: 1,
       preVerificationGas: 0,
       verificationGasLimit: 10e6
     }
 
     // todo: checks the existence of parameters, but since we hexlify the inputs, it fails to validate
     await this._validateParameters(deepHexlify(userOp), entryPointInput)
-    // todo: validation manager duplicate?
-    const errorResult = await this.entryPoint.callStatic.simulateValidation(userOp).catch(e => e)
+    const errorResult = await this.entryPoint.callStatic.simulateHandleOp(userOp, "0x0000000000000000000000000000000000000000", "0x").catch(e => e)
     if (errorResult.errorName === 'FailedOp') {
       throw new RpcError(errorResult.errorArgs.at(-1), ValidationErrors.SimulateValidation)
     }
-    // todo throw valid rpc error
-    if (errorResult.errorName !== 'ValidationResult') {
+    if (errorResult.errorName !== 'ExecutionResult') {
       throw errorResult
     }
 
-    const { returnInfo } = errorResult.errorArgs
     let {
       preOpGas,
       validAfter,
-      validUntil
-    } = returnInfo
-
-    const callGasLimit = await this.provider.estimateGas({
-      from: this.entryPoint.address,
-      to: userOp.sender,
-      data: userOp.callData
-    }).then(b => b.toNumber()).catch(err => {
-      const message = err.message.match(/reason="(.*?)"/)?.at(1) ?? 'execution reverted'
-      throw new RpcError(message, ExecutionErrors.UserOperationReverted)
-    })
+      validUntil,
+      paid
+    } = errorResult.errorArgs
     validAfter = BigNumber.from(validAfter)
     validUntil = BigNumber.from(validUntil)
+    const verificationGas = BigNumber.from(preOpGas).toNumber()
+    const callGasLimit = BigNumber.from(paid).sub(verificationGas)
     if (validUntil === BigNumber.from(0)) {
       validUntil = undefined
     }
@@ -143,7 +134,6 @@ export class UserOpMethodHandler {
       validAfter = undefined
     }
     const preVerificationGas = calcPreVerificationGas(userOp)
-    const verificationGas = BigNumber.from(preOpGas).toNumber()
     return {
       preVerificationGas,
       verificationGas,
