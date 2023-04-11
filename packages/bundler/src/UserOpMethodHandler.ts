@@ -101,8 +101,8 @@ export class UserOpMethodHandler {
     const userOp = {
       ...await resolveProperties(userOp1),
       // default values for missing fields.
-      maxFeePerGas: 1,
-      maxPriorityFeePerGas: 1,
+      maxFeePerGas: 0,
+      maxPriorityFeePerGas: 0,
       preVerificationGas: 0,
       verificationGasLimit: 10e6
     }
@@ -113,6 +113,7 @@ export class UserOpMethodHandler {
     if (errorResult.errorName === 'FailedOp') {
       throw new RpcError(errorResult.errorArgs.at(-1), ValidationErrors.SimulateValidation)
     }
+    // todo throw valid rpc error
     if (errorResult.errorName !== 'ExecutionResult') {
       throw errorResult
     }
@@ -123,17 +124,19 @@ export class UserOpMethodHandler {
       validUntil,
       paid
     } = errorResult.errorArgs
+
     validAfter = BigNumber.from(validAfter)
     validUntil = BigNumber.from(validUntil)
-    const verificationGas = BigNumber.from(preOpGas).toNumber()
-    const callGasLimit = BigNumber.from(paid).sub(verificationGas)
     if (validUntil === BigNumber.from(0)) {
       validUntil = undefined
     }
     if (validAfter === BigNumber.from(0)) {
       validAfter = undefined
     }
+    const verificationGas = BigNumber.from(preOpGas).toNumber()
+    const callGasLimit = BigNumber.from(paid).sub(verificationGas).toNumber()
     const preVerificationGas = calcPreVerificationGas(userOp)
+    console.log('preOpGas', preOpGas, 'paid', paid, 'verificationGas', verificationGas, 'callGasLimit', callGasLimit, 'preVerificationGas', preVerificationGas)
     return {
       preVerificationGas,
       verificationGas,
