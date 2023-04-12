@@ -136,7 +136,6 @@ export class UserOpMethodHandler {
     const verificationGas = BigNumber.from(preOpGas).toNumber()
     const callGasLimit = BigNumber.from(paid).sub(verificationGas).toNumber()
     const preVerificationGas = calcPreVerificationGas(userOp)
-    console.log('preOpGas', preOpGas, 'paid', paid, 'verificationGas', verificationGas, 'callGasLimit', callGasLimit, 'preVerificationGas', preVerificationGas)
     return {
       preVerificationGas,
       verificationGas,
