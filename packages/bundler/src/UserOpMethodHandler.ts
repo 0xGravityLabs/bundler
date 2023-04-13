@@ -11,7 +11,11 @@ import { requireCond, RpcError, tostr } from './utils'
 import { ExecutionManager } from './modules/ExecutionManager'
 import { getAddr } from './modules/moduleUtils'
 import { UserOperationByHashResponse, UserOperationReceipt } from './RpcTypes'
-import { UserOperation, ValidationErrors } from './modules/Types'
+import {
+  ExecutionErrors,
+  UserOperation,
+  ValidationErrors
+} from './modules/Types'
 
 const HEX_REGEX = /^0x[a-fA-F\d]*$/i
 
@@ -116,6 +120,11 @@ export class UserOpMethodHandler {
     // todo throw valid rpc error
     if (errorResult.errorName !== 'ExecutionResult') {
       throw errorResult
+    }
+
+    // polyfill for now
+    if (errorResult.errorArgs.targetResult !== '0x') {
+      throw new RpcError(errorResult.errorArgs.targetResult, ExecutionErrors.UserOperationReverted)
     }
 
     let {
